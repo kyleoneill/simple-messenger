@@ -1,0 +1,3 @@
+- Add check for token lifetime. Ex, if a token is two weeks old then delete it. Allow this length to be configurable by the user
+- create an attribute for auth so I can add something on a function like #[auth("admin")] or #[auth("user")] for better auth
+- user change password
