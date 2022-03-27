@@ -2,15 +2,9 @@ CREATE TABLE IF NOT EXISTS userRelationship
 (
     user_one_id INTEGER NOT NULL,
     user_two_id INTEGER NOT NULL,
-    relationship_status TEXT NOT NULL,
+    is_friend BOOLEAN NOT NULL,
+    is_blocked BOOLEAN NOT NULL,
     PRIMARY KEY (user_one_id, user_two_id)
-);
-
-CREATE TABLE IF NOT EXISTS friendRequests
-(
-    source_user_id INTEGER NOT NULL,
-    target_user_id INTEGER NOT NULL,
-    PRIMARY KEY (source_user_id, target_user_id)
 );
 
 CREATE TABLE IF NOT EXISTS users

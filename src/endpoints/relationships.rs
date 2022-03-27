@@ -16,16 +16,31 @@ pub struct FriendRequest {
     target_username: String
 }
 
-#[post("/send_friend_request")]
-pub async fn send_friend_request_endpoint(req: HttpRequest, pool: web::Data<Pool>, friend_request: web::Json<FriendRequest>) -> Result<impl Responder, CustomError> {
+pub struct UserRelationship {
+    pub user_one_id: i64,
+    pub user_two_id: i64,
+    pub is_friend: bool,
+    pub is_blocked: bool
+}
+
+pub struct Relationship {
+    pub user_one: UserRelationship,
+    pub user_two: UserRelationship
+}
+
+impl Relationship {
+    fn users_are_friends(&self) -> bool {
+        self.user_one.is_friend && self.user_two.is_friend
+    }
+}
+
+#[post("/add_friend")]
+pub async fn add_friend_endpoint(req: HttpRequest, pool: web::Data<Pool>, friend_request: web::Json<FriendRequest>) -> Result<impl Responder, CustomError> {
     let user = auth::authenticate_request(&req, &pool, auth::AuthType::User).await?;
-    let target_user = users::get_user_by_username(&pool, &friend_request.target_username).await
-        .map_err(|_| CustomError {error_type: ErrorType::NotFound, message: Some(format!("User not found with username {}", &friend_request.target_username))})?;
-    if user.id == target_user.id {
+    if user.username == friend_request.target_username {
         return Err(CustomError {error_type: ErrorType::BadClientData, message: Some("You cannot add yourself as a friend".to_string())})
     }
-    // TODO: need to make sure that a relationship doesn't already exist
-    match create_friend_request_sql(&pool, &user.username, &target_user.username).await {
+    match add_friend_sql(&pool, &user.username, &friend_request.target_username).await {
         Ok(_) => Ok(HttpResponse::Ok()),
         Err(e) => {
             println!("{}", e);
@@ -34,32 +49,50 @@ pub async fn send_friend_request_endpoint(req: HttpRequest, pool: web::Data<Pool
     }
 }
 
-#[get("/get_friend_requests")]
-pub async fn get_friend_requests_endpoint(req: HttpRequest, pool: web::Data<Pool>) -> Result<impl Responder, CustomError> {
-    Ok(HttpResponse::Ok())
-}
-
-#[put("/accept_friend_request")]
-pub async fn accept_friend_request_endpoint(req: HttpRequest, pool: web::Data<Pool>) -> Result<impl Responder, CustomError> {
-    Ok(HttpResponse::Ok())
-}
-
 pub fn controller() -> impl HttpServiceFactory {
     web::scope("/relationships")
-        .service(send_friend_request_endpoint)
-        .service(get_friend_requests_endpoint)
-        .service(accept_friend_request_endpoint)
+        .service(add_friend_endpoint)
 }
 
-async fn create_friend_request_sql(pool: &web::Data<Pool>, source_username: &str, requested_username: &str) -> Result<SqliteQueryResult, sqlx::Error> {
+async fn add_friend_sql(pool: &web::Data<Pool>, source_username: &str, requested_username: &str) -> Result<SqliteQueryResult, sqlx::Error> {
     sqlx::query!(
         r#"
-        INSERT OR IGNORE INTO friendRequests (source_user_id, target_user_id)
-        SELECT user1.id, user2.id
+        INSERT OR IGNORE INTO userRelationship
+        SELECT user1.id, user2.id, 1, 0
         FROM users user1, users user2
         WHERE user1.username = $1 and user2.username = $2
         "#,
         source_username,
         requested_username
     ).execute(pool.as_ref()).await
+}
+
+async fn get_relationship_by_usernames_sql(pool: &web::Data<Pool>, source_username: &str, requested_username: &str) -> Result<Relationship, CustomError> {
+    let first_relationship = sqlx::query_as!(
+        UserRelationship,
+        r#"
+        SELECT user_one_id, user_two_id, is_friend, is_blocked FROM userRelationship
+        INNER JOIN users
+        ON userRelationship.user_one_id = users.id
+        WHERE users.username = $1 AND userRelationship.user_two_id IN
+        (SELECT id FROM users WHERE username = $2)
+        "#,
+        source_username,
+        requested_username
+    ).fetch_one(pool.as_ref()).await
+        .map_err(|_| CustomError {error_type: errors::ErrorType::NotFound, message: None})?;
+    let second_relationship = sqlx::query_as!(
+        UserRelationship,
+        r#"
+        SELECT user_one_id, user_two_id, is_friend, is_blocked FROM userRelationship
+        INNER JOIN users
+        ON userRelationship.user_one_id = users.id
+        WHERE users.username = $2 AND userRelationship.user_two_id IN
+        (SELECT id FROM users WHERE username = $1)
+        "#,
+        source_username,
+        requested_username
+    ).fetch_one(pool.as_ref()).await
+        .map_err(|_| CustomError {error_type: errors::ErrorType::NotFound, message: None})?;
+    Ok(Relationship{ user_one: first_relationship, user_two: second_relationship })
 }

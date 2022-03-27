@@ -1,8 +1,12 @@
 # Migrations
-Run the following
+Run the following to create and set up a database.
 ```
 sqlx db create --database-url sqlite:database.sqlite
 sqlx migrate run --database-url sqlite:database.sqlite
+```
+A new migration can be created with
+```
+sqlx migrate add <migration_name>
 ```
 
 # Env
