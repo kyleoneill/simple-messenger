@@ -26,6 +26,12 @@ pub struct CustomError {
     pub message: Option<String>
 }
 
+impl CustomError {
+    pub fn new(error_type: ErrorType, message: Option<String>) -> Self {
+        Self { error_type, message }
+    }
+}
+
 impl fmt::Display for CustomError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.message {

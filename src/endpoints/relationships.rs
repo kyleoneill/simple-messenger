@@ -42,18 +42,12 @@ pub async fn get_relationships(req: HttpRequest, pool: web::Data<Pool>) -> Resul
 pub async fn get_relationship_with_user(req: HttpRequest, pool: web::Data<Pool>, target_username: web::Query<TargetUsername>) -> Result<impl Responder, CustomError> {
     let user = auth::authenticate_request(&req, &pool, auth::AuthType::User).await?;
     if user.username == target_username.target_username {
-        return Err(CustomError {error_type: ErrorType::BadClientData, message: Some("You are not a friend with yourself.".to_string())})
+        return Err(CustomError::new( ErrorType::BadClientData, Some("You are not a friend with yourself.".to_string())))
     }
     match get_single_relationship_sql(&pool, user.id.unwrap(), &target_username.target_username).await {
-        Ok(relationship) => {
-            Ok(web::Json(relationship))
-        }
-        Err(sqlx_err) => {
-            match sqlx_err {
-                sqlx::Error::RowNotFound => Err(CustomError {error_type: ErrorType::NotFound, message: Some("Relationship with target_username not found".to_string())}),
-                _ => Err(CustomError {error_type: ErrorType::InternalError, message: None})
-            }
-        }
+        Ok(relationship) => Ok(web::Json(relationship)),
+        Err(sqlx::Error::RowNotFound) => Err(CustomError::new(ErrorType::NotFound,Some("Relationship with target_username not found".to_string()))),
+        _ => Err(CustomError::new(ErrorType::InternalError, None))
     }
 }
 
