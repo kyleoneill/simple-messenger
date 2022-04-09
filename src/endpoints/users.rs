@@ -5,7 +5,6 @@ use crate::Pool;
 extern crate bcrypt;
 
 use crate::util;
-use crate::auth;
 
 use crate::errors;
 use errors::{CustomError, ErrorType};
@@ -16,11 +15,6 @@ pub struct User {
     pub username: String,
     pub hashed_password: String,
     pub is_admin: bool
-}
-
-pub struct Token {
-    token: String,
-    username: String
 }
 
 #[derive(Deserialize)]

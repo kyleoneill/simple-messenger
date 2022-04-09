@@ -1,7 +1,8 @@
 extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
-use actix_web::{web, App, HttpResponse, HttpServer, Responder, error, http::header::ContentType, middleware};
+use actix_web::{web, App, HttpResponse, HttpServer, Responder, error, http::header, middleware};
+use actix_cors::Cors;
 mod errors;
 mod util;
 mod auth;
@@ -10,12 +11,12 @@ mod auth;
 
 async fn health() -> impl Responder {
     HttpResponse::Ok()
-        .content_type(ContentType::json())
+        .content_type(header::ContentType::json())
         .body(format!(r#"{{"status":"Online"}}"#))
 }
 
-pub type Databse = sqlx::Sqlite;
-pub type Pool = sqlx::Pool<Databse>;
+pub type Database = sqlx::Sqlite;
+pub type Pool = sqlx::Pool<Database>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -23,21 +24,28 @@ async fn main() -> std::io::Result<()> {
     let pool = Pool::connect(&env::var("DATABASE_URL").unwrap()).await.unwrap();
     
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("http://127.0.0.1:3000")
+            .allowed_origin("http://localhost:3000")
+            .allow_any_header()
+            .allow_any_method()
+            .supports_credentials();
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .wrap(middleware::Compress::default())
+            .wrap(cors)
             .service(
                 web::scope("/api")
                     .service(users::controller())
                     .service(relationships::controller())
                     .route("/health", web::get().to(health))
             )
-            .app_data(web::JsonConfig::default().error_handler(|err, _req| {
+            .app_data(web::JsonConfig::default().error_handler(|_err, _req| {
                 error::InternalError::from_response(
                     "",
                     HttpResponse::BadRequest()
                         .content_type("application/json")
-                        .body(format!(r#"{{"error":"{}"}}"#, err)) // This is not escaped and can create an invalid document
+                        .body(format!(r#"{{"msg":"Internal server error"}}"#))
                 )
                 .into()
             }))

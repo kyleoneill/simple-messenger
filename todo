@@ -1,3 +1,12 @@
 - Add check for token lifetime. Ex, if a token is two weeks old then delete it. Allow this length to be configurable by the user
 - create an attribute for auth so I can add something on a function like #[auth("admin")] or #[auth("user")] for better auth
 - user change password
+
+- plan out a conversation struct / table
+    - a conversation will be either a DM or a group conversation
+        - if group, it will have a group name
+        - if group, it can have a group photo
+    - you can set your nickname for a conversation
+    - set color and font for the conversation?
+
+- Require an API key to make any request

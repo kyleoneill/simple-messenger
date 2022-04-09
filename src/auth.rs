@@ -20,6 +20,9 @@ pub async fn authenticate_request(req: &HttpRequest, pool: &web::Data<Pool>, aut
                 .map_err(|_| CustomError {error_type: errors::ErrorType::BadClientData, message: Some(format!("invalid token in authorization header"))})?;
             let user = sqlx::query_as!(users::User, r#"SELECT * FROM users WHERE username = $1"#, record.username).fetch_one(pool.as_ref()).await
                 .map_err(|_| CustomError {error_type: errors::ErrorType::InternalError, message: None})?;
+            if user.id.is_none() {
+                return Err(CustomError {error_type: errors::ErrorType::InternalError, message: Some(format!("User does not have an ID"))})
+            }
             match auth_type {
                 AuthType::User => Ok(user),
                 AuthType::Admin => {
