@@ -15,6 +15,8 @@ pub enum AuthType {
 pub async fn authenticate_request(req: &HttpRequest, pool: &web::Data<Pool>, auth_type: AuthType) -> Result<User, CustomError> {
     match req.headers().get(actix_web::http::header::AUTHORIZATION) {
         Some(header) => {
+            // TODO: Is there a way to make this only make one DB fetch? Right now it makes two (one to get the token's associate username, a second to get the user itself)
+            // TODO: remove this unwrap
             let token = header.to_str().unwrap();
             let record = sqlx::query!(r#"SELECT username FROM tokens WHERE token = $1"#, token).fetch_one(pool.as_ref()).await
                 .map_err(|_| CustomError {error_type: errors::ErrorType::BadClientData, message: Some(format!("invalid token in authorization header"))})?;
