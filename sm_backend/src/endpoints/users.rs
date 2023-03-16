@@ -59,10 +59,19 @@ pub async fn auth_user(pool: web::Data<Pool>, user: web::Json<WebUser>) -> Resul
     }
 }
 
+#[post("/logout")]
+pub async fn logout(pool: web::Data<Pool>, user: User) -> Result<impl Responder, CustomError> {
+    match delete_token(&pool, &user.username).await {
+        Ok(_) => Ok(HttpResponse::Ok()),
+        Err(_) => Err(CustomError::new(ErrorType::InternalError, None))
+    }
+}
+
 pub fn controller() -> impl HttpServiceFactory {
     web::scope("/users")
         .service(post_user)
         .service(auth_user)
+        .service(logout)
 }
 
 pub async fn get_user_by_username(pool: &web::Data<Pool>, username: &str) -> Result<User, sqlx::Error> {
@@ -100,6 +109,18 @@ async fn generate_token(pool: &web::Data<Pool>, username: &str) -> Result<String
         current_time
     ).execute(pool.as_ref()).await {
         Ok(_) => Ok(token),
+        Err(e) => Err(e)
+    }
+}
+
+async fn delete_token(pool: &web::Data<Pool>, username: &str) -> Result<(), sqlx::Error> {
+    match sqlx::query!(
+        r#"
+        DELETE FROM tokens WHERE username = $1
+        "#,
+        username
+    ).execute(pool.as_ref()).await {
+        Ok(_) => Ok(()),
         Err(e) => Err(e)
     }
 }
