@@ -1,4 +1,3 @@
-extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder, error, http::header, middleware};

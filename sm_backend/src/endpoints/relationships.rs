@@ -4,10 +4,9 @@ use sqlx::sqlite::SqliteQueryResult;
 use crate::Pool;
 use crate::models::user_relationship::UserRelationship;
 
-use crate::auth;
-
 use crate::errors;
 use errors::{CustomError, ErrorType};
+use crate::models::user::User;
 
 #[derive(Deserialize)]
 pub struct TargetUsername {
@@ -22,8 +21,7 @@ pub struct PublicFacingRelationship {
 }
 
 #[get("")]
-pub async fn get_relationships(req: HttpRequest, pool: web::Data<Pool>) -> Result<impl Responder, CustomError> {
-    let user = auth::authenticate_request(&req, &pool, auth::AuthType::User).await?;
+pub async fn get_relationships(_req: HttpRequest, pool: web::Data<Pool>, user: User) -> Result<impl Responder, CustomError> {
     match get_relationships_sql(&pool, user.id.unwrap()).await {
         Ok(relationships) => {
             Ok(web::Json(relationships))
@@ -33,8 +31,7 @@ pub async fn get_relationships(req: HttpRequest, pool: web::Data<Pool>) -> Resul
 }
 
 #[get("/with_user")]
-pub async fn get_relationship_with_user(req: HttpRequest, pool: web::Data<Pool>, target_username: web::Query<TargetUsername>) -> Result<impl Responder, CustomError> {
-    let user = auth::authenticate_request(&req, &pool, auth::AuthType::User).await?;
+pub async fn get_relationship_with_user(_req: HttpRequest, pool: web::Data<Pool>, user: User, target_username: web::Query<TargetUsername>) -> Result<impl Responder, CustomError> {
     if user.username == target_username.target_username {
         return Err(CustomError::new( ErrorType::BadClientData, Some("You are not a friend with yourself.".to_string())))
     }
@@ -47,8 +44,7 @@ pub async fn get_relationship_with_user(req: HttpRequest, pool: web::Data<Pool>,
 
 #[post("/add_friend")]
 /// Add a friend
-pub async fn add_friend_endpoint(req: HttpRequest, pool: web::Data<Pool>, friend_request: web::Json<TargetUsername>) -> Result<impl Responder, CustomError> {
-    let user = auth::authenticate_request(&req, &pool, auth::AuthType::User).await?;
+pub async fn add_friend_endpoint(_req: HttpRequest, pool: web::Data<Pool>, user: User, friend_request: web::Json<TargetUsername>) -> Result<impl Responder, CustomError> {
     if user.username == friend_request.target_username {
         return Err(CustomError {error_type: ErrorType::BadClientData, message: Some("You cannot add yourself as a friend".to_string())})
     }
