@@ -1,5 +1,4 @@
 extern crate dotenv;
-extern crate sm_derive;
 use dotenv::dotenv;
 use std::env;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder, error, http::header, middleware};
@@ -7,8 +6,8 @@ use actix_cors::Cors;
 mod errors;
 mod util;
 mod auth;
-#[path = "endpoints/users.rs"] mod users;
-#[path = "endpoints/relationships.rs"] mod relationships;
+mod models;
+mod endpoints;
 
 async fn health() -> impl Responder {
     HttpResponse::Ok()
@@ -37,8 +36,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .service(
                 web::scope("/api")
-                    .service(users::controller())
-                    .service(relationships::controller())
+                    .service(endpoints::users::controller())
+                    .service(endpoints::relationships::controller())
                     .route("/health", web::get().to(health))
             )
             .app_data(web::JsonConfig::default().error_handler(|_err, _req| {

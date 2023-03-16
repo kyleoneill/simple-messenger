@@ -1,5 +1,0 @@
-/target
-*.env
-*.sqlite-*
-*.sqlite
-*dev.sql

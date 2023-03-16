@@ -2,7 +2,7 @@ use actix_web::{get, post, web, HttpResponse, Responder, dev::HttpServiceFactory
 use serde::{Serialize, Deserialize};
 use sqlx::sqlite::SqliteQueryResult;
 use crate::Pool;
-use sm_derive::authenticate_user;
+use crate::models::user_relationship::UserRelationship;
 
 use crate::auth;
 
@@ -14,13 +14,6 @@ pub struct TargetUsername {
     target_username: String
 }
 
-pub struct UserRelationship {
-    pub user_one_id: i64,
-    pub user_two_id: i64,
-    pub is_friend: bool,
-    pub is_blocked: bool
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct PublicFacingRelationship {
     pub username: String,
@@ -29,7 +22,6 @@ pub struct PublicFacingRelationship {
 }
 
 #[get("")]
-#[authenticate_user(User)]
 pub async fn get_relationships(req: HttpRequest, pool: web::Data<Pool>) -> Result<impl Responder, CustomError> {
     let user = auth::authenticate_request(&req, &pool, auth::AuthType::User).await?;
     match get_relationships_sql(&pool, user.id.unwrap()).await {

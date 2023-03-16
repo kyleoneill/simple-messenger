@@ -1,21 +1,14 @@
-use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder, dev::HttpServiceFactory, HttpRequest};
-use serde::{Serialize, Deserialize};
+use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder, dev::HttpServiceFactory};
+use serde::Deserialize;
 use sqlx::sqlite::SqliteQueryResult;
 use crate::Pool;
 extern crate bcrypt;
 
 use crate::util;
+use crate::models::user::User;
 
 use crate::errors;
 use errors::{CustomError, ErrorType};
-
-#[derive(Serialize, Deserialize)]
-pub struct User {
-    pub id: Option<i64>,
-    pub username: String,
-    pub hashed_password: String,
-    pub is_admin: bool
-}
 
 #[derive(Deserialize)]
 pub struct WebUser {
