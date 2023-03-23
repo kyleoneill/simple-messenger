@@ -5,6 +5,7 @@ const enteredUsername = ref('');
 const enteredPassword = ref('');
 const confirmedPassword = ref('');
 const createUser = ref(false);
+defineProps(["setUserInfo"]);
 // TODO: Add button so that password inbox box can have visible password
 // will need some button that toggles the input box type between
 // 'text' and 'password'
@@ -33,7 +34,7 @@ const createUser = ref(false);
           required
       />
       <br />
-      <button @click="$emit('user-log-in', enteredUsername, enteredPassword)" class="m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded">Login</button>
+      <button @click="$emit('user-log-in', enteredUsername, enteredPassword, setUserInfo)" class="m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded">Login</button>
       <br />
       <a @click="createUser=true">Create a user</a>
     </div>
@@ -66,7 +67,7 @@ const createUser = ref(false);
           required
       />
       <br />
-      <button @click="$emit('create-new-user', enteredUsername, enteredPassword, confirmedPassword)" class="m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded">Create User</button>
+      <button @click="$emit('create-new-user', enteredUsername, enteredPassword, confirmedPassword, setUserInfo)" class="m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded">Create User</button>
       <br />
       <a @click="createUser=false">Go back to login</a>
     </div>
