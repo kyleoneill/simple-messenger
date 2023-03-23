@@ -23,9 +23,15 @@ async fn main() -> std::io::Result<()> {
     let pool = Pool::connect(&env::var("DATABASE_URL").unwrap()).await.unwrap();
     
     HttpServer::new(move || {
+        //let cors = Cors::default().allow_any_origin().send_wildcard();
         let cors = Cors::default()
-            .allowed_origin("http://127.0.0.1:3000")
-            .allowed_origin("http://localhost:3000")
+            //TODO: what the actual **** is going on with CORS
+            .allowed_origin("http://127.0.0.1:5173")
+            .allowed_origin("http://127.0.0.1:5173/")
+            .allowed_origin("http://localhost:5173")
+            .allowed_origin("http://localhost:5173/")
+            // .allowed_origin("https://localhost:5173")
+            // .allowed_origin("https://localhost:5173/")
             .allow_any_header()
             .allow_any_method()
             .supports_credentials();

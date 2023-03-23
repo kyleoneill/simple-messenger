@@ -20,6 +20,7 @@ pub struct PublicFacingRelationship {
     pub is_blocked: bool
 }
 
+// TODO: Make this paginated, taking query params to determine page size, starting page, pages to return
 #[get("")]
 pub async fn get_relationships(_req: HttpRequest, pool: web::Data<Pool>, user: User) -> Result<impl Responder, CustomError> {
     match get_relationships_sql(&pool, user.id.unwrap()).await {
