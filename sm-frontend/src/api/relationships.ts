@@ -9,3 +9,12 @@ export function getRelationships(): Promise<any> {
             return error;
         });
 }
+
+export async function getFriends(): Promise<string[]> {
+    let friends = [];
+    let response = await getRelationships();
+    if(response.status === 200) {
+        friends = response.data;
+    }
+    return friends;
+}

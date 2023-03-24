@@ -1,13 +1,31 @@
 import {displayToast} from "./errorToast";
 import {createUser, login, logout} from "../api/user";
 import axios from "axios";
+import {defineStore} from "pinia";
 
 type User = {
     username: String,
     token: String
 }
 
-export function getUserFromStorage() {
+export const useUserStore = defineStore('userData', {
+    state: () => {
+        return {
+            username: '',
+            friends: []
+        }
+    },
+    actions: {
+        updateUsername(newUsername: string) {
+            this.username = newUsername;
+        },
+        setFriends(friendsList: string[]) {
+            this.friends = friendsList;
+        }
+    }
+});
+
+export function getUserFromStorage(): User {
     let storedName = window.localStorage.getItem("username");
     let storedToken = window.localStorage.getItem("token");
     if (storedName != null && storedToken != null) {

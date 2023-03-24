@@ -1,24 +1,29 @@
 <script setup lang="ts">
+// TODO: clean up imports, I should be using some kind of auto-formatter
 import axios from "axios";
 import { ref } from 'vue';
 import { RouterLink, RouterView } from 'vue-router'
-import { getUserFromStorage, tryCreateUser, tryLogIn, tryLogout, tryGetLocalStorage } from "./stores/user";
+import { getUserFromStorage, tryCreateUser, tryLogIn, tryLogout, tryGetLocalStorage, useUserStore } from "./stores/user";
 import LoginView from "./views/LoginView.vue";
+import { getFriends } from './api/relationships';
 
 axios.defaults.baseURL = "http://localhost:8080";
-axios.defaults.validateStatus = function() {
-  return true;
-}
+axios.defaults.validateStatus = function() { return true; }
 
 const user = ref(getUserFromStorage());
 
-function setUserInfo(newUserName: string, newToken: string) {
+async function initializeUserState(newUserName: string, newToken: string) {
+  axios.defaults.headers.common["Authorization"] = newToken;
+  const userState = useUserStore();
+  let friends = await getFriends();
+  userState.updateUsername(newUserName);
+  userState.setFriends(friends);
+
   user.value.username = newUserName;
   user.value.token = newToken;
-  axios.defaults.headers.common["Authorization"] = newToken;
 }
 
-tryGetLocalStorage(setUserInfo);
+tryGetLocalStorage(initializeUserState);
 </script>
 
 <template>
@@ -37,7 +42,7 @@ tryGetLocalStorage(setUserInfo);
       <RouterView />
     </div>
     <div v-else>
-      <LoginView @user-log-in="tryLogIn" @create-new-user="tryCreateUser" :setUserInfo="setUserInfo" />
+      <LoginView @user-log-in="tryLogIn" @create-new-user="tryCreateUser" :setUserInfo="initializeUserState" />
     </div>
   </div>
 </template>

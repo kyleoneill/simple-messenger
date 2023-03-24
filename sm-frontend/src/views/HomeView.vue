@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { getRelationships } from "../api/relationships";
-let friendsList = [];
-getRelationships().then(response => {
-  if(response.status === 200) {
-    for (const i in response.data) {
-      friendsList.push(response.data[i]);
-    }
-  }
-  console.log(response);
-});
+import { useUserStore } from '../stores/user';
+const userStore = useUserStore();
 </script>
 
 <template>
   <main>
     <ul>
-      <li v-for="friend in friendsList" :key="friend.username">
-        {{friend.username}}
+      <li v-for="friend in userStore.friends" :key="friend">
+        {{friend}}
       </li>
     </ul>
   </main>
