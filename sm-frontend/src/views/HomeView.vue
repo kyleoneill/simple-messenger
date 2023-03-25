@@ -5,6 +5,7 @@ const userStore = useUserStore();
 
 <template>
   <main>
+    <div>{{userStore.username}}</div>
     <ul>
       <li v-for="friend in userStore.friends" :key="friend">
         {{friend}}

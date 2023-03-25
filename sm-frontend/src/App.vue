@@ -27,7 +27,7 @@ tryGetLocalStorage(initializeUserState);
 </script>
 
 <template>
-  <div class="bg-slate-700 min-h-screen m-0 overflow-auto">
+  <div class="bg-void-0 min-h-screen m-0 overflow-auto">
     <div v-if="user.token !== ''">
       <header>
         <div class="wrapper">
