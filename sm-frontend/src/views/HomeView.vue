@@ -16,7 +16,7 @@ function selectFriend(selected: string) {
       <div class="text-stark-0 text-2xl">Friends List</div>
       <div class="sticky bottom-0 bg-slate-400/20 h-0.5 mt-2 mb-2" />
       <ul>
-        <li @click="selectFriend(friend.username)" v-for="friend in userStore.friends" :key="friend.username" class="text-stark-0">{{friend.username}}</li>
+        <li @click="selectFriend(friend.username)" v-for="friend in userStore.friends" :key="friend.username" class="text-stark-0 cursor-pointer">{{friend.username}}</li>
       </ul>
     </div>
     <ChatArea :friend="selectedFriend" />
