@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, watch } from 'vue';
 import { createPinia } from 'pinia';
 import Toast, { PluginOptions } from "vue-toastification";
 import "vue-toastification/dist/index.css";
@@ -16,7 +16,18 @@ const toastOptions: PluginOptions = {
     newestOnTop: true
 };
 
-app.use(createPinia());
+const pinia = createPinia();
+
+// This watcher makes sure that pinia state is persistent across reloads 
+watch(
+    pinia.state,
+    (state) => {
+        localStorage.setItem("userData", JSON.stringify(state.userData))
+    },
+    {deep: true}
+)
+
+app.use(pinia);
 app.use(router);
 app.use(Toast, toastOptions);
 

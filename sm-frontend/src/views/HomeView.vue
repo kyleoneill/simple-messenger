@@ -2,11 +2,18 @@
 import { useUserStore } from '../stores/user';
 import {ref} from "vue";
 import ChatArea from "../components/ChatArea.vue";
+import { storeToRefs } from "pinia";
 const userStore = useUserStore();
 const selectedFriend = ref('');
 
 function selectFriend(selected: string) {
   selectedFriend.value = selected;
+}
+
+// If the user has any friends, automatically open a chat with the first one in our friends list
+let friends = userStore.friendsList;
+if(friends.length > 0) {
+  selectedFriend.value = friends[0].username;
 }
 </script>
 

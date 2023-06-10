@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import {Ref, ref} from "vue";
-import { TextMessage } from "../stores/message";
+import type { Ref } from "vue";
+import { ref } from "vue";
+import type { TextMessage } from "../stores/message";
 import { useUserStore } from "../stores/user";
 const userStore = useUserStore();
 
@@ -15,7 +16,17 @@ const messages: Ref<Array<TextMessage>> = ref([]);
 function sendMessage() {
   if(enteredMessage.value !== '' && enteredMessage.value.length < MAX_MSG_LENGTH) {
     // TODO: Make an actual call here to send a message
-    messages.value.push({id: 1, sender: userStore.username, receiver: props.friend, timestamp: 0, contents: enteredMessage.value});
+    
+    // Var and if/else converts a (string | undefined) to a string
+    var receiver: string;
+    if(props.friend == undefined) {
+      // TODO: Error handle here, can this ever be undefined?
+      receiver = '';
+    }
+    else {
+      receiver = props.friend;
+    }
+    messages.value.push({id: 1, sender: userStore.username, receiver, timestamp: 0, contents: enteredMessage.value});
     enteredMessage.value = '';
   }
 }
@@ -40,7 +51,7 @@ function sendMessage() {
           v-model="enteredMessage"
           v-on:keyup.enter="sendMessage"
           :placeholder="'Message ' + props.friend"
-          class="m-2 p-2 rounded"
+          class="m-2 p-2 rounded w-7/12"
       />
     </aside>
   </div>

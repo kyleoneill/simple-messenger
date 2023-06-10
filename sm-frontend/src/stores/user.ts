@@ -8,11 +8,31 @@ type User = {
     token: String
 }
 
+type Friend = {
+    username: String,
+    is_friend: boolean,
+    is_blocked: boolean
+}
+
+interface UserDataStore {
+    username: string,
+    friends: Friend[]
+}
+
 export const useUserStore = defineStore('userData', {
     state: () => {
-        return {
+        // the localStorage syntax is used to make sure pinia state is persistent across reloads. See main.ts
+        if (localStorage.getItem("userData"))
+            return JSON.parse(localStorage.getItem("userData"));
+        const store: UserDataStore = {
             username: '',
             friends: []
+        }
+        return store;
+    },
+    getters: {
+        friendsList(): Friend[] {
+            return this.friends
         }
     },
     actions: {

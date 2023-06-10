@@ -12,5 +12,12 @@ sqlx migrate add <migration_name>
 # Env
 Create a .env file with the following content - `DATABASE_URL="sqlite:database.sqlite"`
 
-# Run
-Run with `cargo run`
+# Running
+
+## Backend
+
+From the sm_backend folder, run `cargo run`
+
+## Frontend
+
+From the sm-frontend folder, run `npm run dev`

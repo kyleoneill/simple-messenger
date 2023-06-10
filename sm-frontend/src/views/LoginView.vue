@@ -38,6 +38,7 @@ function swapLoginCreate() {
           v-model="enteredPassword"
           placeholder="Password"
           class="m-2 p-2 rounded"
+          v-on:keyup.enter="$emit('user-log-in', enteredUsername, enteredPassword, setUserInfo)"
           required
       />
       <br />
@@ -71,6 +72,7 @@ function swapLoginCreate() {
           v-model="confirmedPassword"
           placeholder="Confirm password"
           class="m-2 p-2 rounded"
+          v-on:keyup.enter="$emit('create-new-user', enteredUsername, enteredPassword, confirmedPassword, setUserInfo)"
           required
       />
       <br />
