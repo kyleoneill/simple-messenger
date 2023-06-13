@@ -2,7 +2,6 @@
 import { useUserStore } from '../stores/user';
 import {ref} from "vue";
 import ChatArea from "../components/ChatArea.vue";
-import { storeToRefs } from "pinia";
 const userStore = useUserStore();
 const selectedFriend = ref('');
 

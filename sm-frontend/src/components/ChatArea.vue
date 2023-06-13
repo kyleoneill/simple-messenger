@@ -3,6 +3,7 @@ import type { Ref } from "vue";
 import { ref } from "vue";
 import type { TextMessage } from "../stores/message";
 import { useUserStore } from "../stores/user";
+import Message from './Message.vue';
 const userStore = useUserStore();
 
 const props = defineProps({
@@ -36,12 +37,7 @@ function sendMessage() {
   <div v-if="props.friend !== ''" class="w-9/12 flex flex-col">
     <div class="flex-1">
       <div v-for="message in messages" :key="message.id" class="text-stark-0">
-        <div v-if="message.sender === userStore.username" class="flex justify-end">
-          <div>{{message.contents}}</div>
-        </div>
-        <div v-else class="flex justify-start">
-          <div>{{message.contents}}</div>
-        </div>
+        <Message :message="message.contents" :is-our-message="message.sender === userStore.username"/>
       </div>
     </div>
     <aside class="mb-8">
