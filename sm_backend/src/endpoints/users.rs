@@ -1,3 +1,4 @@
+use std::time::{SystemTime, UNIX_EPOCH};
 use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder, dev::HttpServiceFactory};
 use serde::Deserialize;
 use sqlx::sqlite::SqliteQueryResult;
@@ -126,13 +127,17 @@ async fn delete_token(pool: &web::Data<Pool>, username: &str) -> Result<(), sqlx
 }
 
 async fn create_user(pool: &web::Data<Pool>, user: web::Json<WebUser>, is_admin: bool) -> Result<SqliteQueryResult, sqlx::Error> {
+    let start = SystemTime::now();
+    let since_the_epoch = start.duration_since(UNIX_EPOCH).expect("Time went backwards");
+    let millis: i64 = since_the_epoch.as_millis() as i64;
     let hashed_password = bcrypt::hash(&user.password, bcrypt::DEFAULT_COST).expect("Failed to hash password");
     sqlx::query!(
         r#"
-        INSERT INTO users (username, hashed_password, is_admin) VALUES ($1, $2, $3)
+        INSERT INTO users (username, hashed_password, is_admin, creation_datestamp) VALUES ($1, $2, $3, $4)
         "#,
         user.username,
         hashed_password,
-        is_admin
+        is_admin,
+        millis
     ).execute(pool.as_ref()).await
 }

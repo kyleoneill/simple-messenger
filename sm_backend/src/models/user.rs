@@ -12,7 +12,8 @@ pub struct User {
     pub id: Option<i64>,
     pub username: String,
     pub hashed_password: String,
-    pub is_admin: bool
+    pub is_admin: bool,
+    pub creation_datestamp: i64
 }
 
 impl FromRequest for User {

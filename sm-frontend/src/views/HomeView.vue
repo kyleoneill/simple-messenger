@@ -28,3 +28,15 @@ if(friends.length > 0) {
     <ChatArea :friend="selectedFriend" />
   </main>
 </template>
+
+<style>
+  .sm-btn-3d {
+    @apply bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-pink-300 rounded
+  }
+  .sm-btn {
+    @apply m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded
+  }
+  .sm-white-link-text {
+    @apply text-stark-0 hover:underline cursor-pointer
+  }
+</style>

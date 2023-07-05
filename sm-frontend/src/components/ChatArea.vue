@@ -49,6 +49,11 @@ function sendMessage() {
           :placeholder="'Message ' + props.friend"
           class="m-2 p-2 rounded w-7/12"
       />
+      <button
+        id="sendMessageButton"
+        @click="sendMessage"
+        class="sm-btn-3d"
+      >Send</button>
     </aside>
   </div>
 </template>

@@ -42,9 +42,9 @@ function swapLoginCreate() {
           required
       />
       <br />
-      <button @click="$emit('user-log-in', enteredUsername, enteredPassword, setUserInfo)" class="m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded">Login</button>
+      <button @click="$emit('user-log-in', enteredUsername, enteredPassword, setUserInfo)" class="sm-btn">Login</button>
       <br />
-      <a class="text-stark-0 no-underline hover:underline cursor-pointer" @click="swapLoginCreate">Create a user</a>
+      <a class="sm-white-link-text" @click="swapLoginCreate">Create a user</a>
     </div>
     <div v-else>
       <h1 class="text-3xl text-stark-0">Create a user</h1>
@@ -76,9 +76,9 @@ function swapLoginCreate() {
           required
       />
       <br />
-      <button @click="$emit('create-new-user', enteredUsername, enteredPassword, confirmedPassword, setUserInfo)" class="m-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded">Create User</button>
+      <button @click="$emit('create-new-user', enteredUsername, enteredPassword, confirmedPassword, setUserInfo)" class="sm-btn">Create User</button>
       <br />
-      <a class="text-stark-0 hover:underline cursor-pointer" @click="swapLoginCreate">Go back to login</a>
+      <a class="sm-white-link-text" @click="swapLoginCreate">Go back to login</a>
     </div>
   </div>
 </template>
